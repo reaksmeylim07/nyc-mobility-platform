@@ -1,0 +1,35 @@
+services:
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5433:5432"                       # Mac:container, for your SQL client
+    volumes:
+      - pgdata:/var/lib/postgresql/data   # data survives container removal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s                        # ask every 5 seconds
+      timeout: 3s
+      retries: 10                         # give up after 10 failed checks
+
+  ingestion:
+    build:
+      context: .                          # same as the "." in docker build
+      dockerfile: docker/ingestion/Dockerfile
+    environment:
+      PIPELINE_ENV: dev
+      POSTGRES_HOST: postgres             # the SERVICE NAME, not localhost
+      POSTGRES_PORT: "5432"               # the CONTAINER port, not 5433
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy        # wait for "ready", not just "started"
+
+volumes:
+  pgdata:                                 # declare the named volume
