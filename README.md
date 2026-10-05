@@ -74,7 +74,39 @@ flowchart LR
 - [ ] **Phase 4 — Streaming & data quality:** real-time ingestion, data contracts, production hardening
 
 ## Engineering Trade-offs & Scaling Considerations
+### Local storage: named volume for Postgres, bind mount for source code
 
+**Decision:** In local development, Postgres stores its data in a Docker named
+volume (`pgdata`), while application source code is shared into containers
+with a bind mount (`./src:/app/src`).
+
+**Why:**
+- *Postgres → named volume.* Database files must outlive any single container.
+  A named volume is managed by Docker, persists across `docker rm`, and lives
+  inside Docker's Linux VM, which gives near-native disk performance and
+  avoids file ownership issues (Postgres requires strict ownership and
+  permissions on its data directory).
+- *Source code → bind mount.* During development, code changes constantly.
+  A bind mount lets the container read files directly from the host, so edits
+  appear instantly with no image rebuild. This shortens the feedback loop
+  from minutes to seconds.
+
+**Alternatives considered:**
+- *Bind mount for Postgres:* rejected. On macOS, bind-mounted I/O crosses the
+  VM boundary and is noticeably slower; host file permissions often conflict
+  with Postgres's ownership requirements; and a database folder inside the
+  repo risks being accidentally committed or deleted.
+- *Named volume for source code:* rejected. Volumes are opaque to the host,
+  so code could not be edited with a normal IDE, and changes would require
+  copying files in manually.
+- *No persistent storage (container writable layer):* rejected. All data is
+  lost whenever the container is removed.
+
+**Scope / when this changes:** This setup is for local development only.
+In production, source code is baked into an immutable image via `COPY`
+(no bind mounts), and the database runs as a managed service (e.g. Cloud SQL)
+with its own backups and replication. Container-level storage is not used
+for production data.
 _Documented as architectural decisions are made. See `docs/adr/`._
 
 ## License
