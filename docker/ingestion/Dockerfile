@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED=1
 # 4. Install libraries (slow, rarely changes → near the top)
 #    We'll use `requests` later to download taxi data files.
 RUN pip install --no-cache-dir requests==2.32.3
-
+RUN pip install --no-cache-dir requests==2.32.3 "psycopg[binary]==3.2.3"
 # 5. Copy our code from the Mac into the image (changes often → near the bottom)
 COPY src/ ./src/
 
