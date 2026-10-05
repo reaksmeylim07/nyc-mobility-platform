@@ -72,7 +72,17 @@ flowchart LR
 - [ ] **Phase 2 — Cloud infrastructure & storage:** Terraform-managed cloud resources, layered lakehouse storage
 - [ ] **Phase 3 — Distributed processing:** Spark cluster, partitioning and performance tuning
 - [ ] **Phase 4 — Streaming & data quality:** real-time ingestion, data contracts, production hardening
+## Quickstart
 
+**Prerequisites:** Docker Desktop, Make
+
+```bash
+cp .env.example .env    # then set your own local values
+make up                 # start Postgres and build services
+make run                # run the ingestion job once
+make psql               # inspect data (\q to exit)
+make down               # stop everything (data is kept)
+```
 ## Engineering Trade-offs & Scaling Considerations
 ### Local storage: named volume for Postgres, bind mount for source code
 
