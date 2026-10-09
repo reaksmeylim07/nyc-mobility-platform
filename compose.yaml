@@ -1,5 +1,35 @@
 services:
 
+  object-store-init:
+    image: alpine:3.20
+    command: ["sh", "-c", "chown -R 10001:10001 /data && echo 'permissions fixed'"]
+    volumes:
+      - s3data:/data
+
+  object-store:
+    image: rustfs/rustfs:1.0.1             # pinned; S3-compatible, local dev only
+    environment:
+      RUSTFS_VOLUMES: /data
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_KEY}
+      RUSTFS_UNSAFE_BYPASS_DISK_CHECK: "true"   # single-disk laptop setup; never in production
+    ports:
+      - "9000:9000"     # S3 API (what code talks to)
+      - "9001:9001"     # web console (what you look at)
+    volumes:
+      - s3data:/data
+    depends_on:
+      object-store-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
   postgres:
     image: postgres:16
     environment:
@@ -27,9 +57,18 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      S3_ENDPOINT_URL: http://object-store:9000
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_BUCKET: ${S3_BUCKET}
+      TLC_DATASET: yellow_tripdata
+      TLC_MONTH: "2024-01"
     depends_on:
       postgres:
         condition: service_healthy        # wait for "ready", not just "started"
+      object-store:
+        condition: service_healthy
 
 volumes:
   pgdata:                                 # declare the named volume
+  s3data:
