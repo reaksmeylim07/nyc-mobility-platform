@@ -1,21 +1,27 @@
-# 1. Start from an official image with Linux + Python 3.12 (small variant)
+# 1. Base image: Linux + Python 3.12
 FROM python:3.12-slim
 
-# 2. Create /app inside the image and make it the current folder
+# 2. Bring in the uv binary from its official image (pinned version)
+COPY --from=ghcr.io/astral-sh/uv:0.13.0 /uv /uvx /bin/
+
+# 3. Settings
+ENV PYTHONUNBUFFERED=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_NO_DEV=1 \
+    UV_PYTHON_DOWNLOADS=never
+
 WORKDIR /app
 
-# 3. Make Python print logs immediately instead of buffering them
-ENV PYTHONUNBUFFERED=1
+# 4. Install dependencies ONLY (cached until pyproject.toml or uv.lock change)
+COPY pyproject.toml uv.lock ./
+RUN uv sync --locked --no-install-project
 
-# 4. Install third-party libraries (slow, rarely changes → near the top)
-RUN pip install --no-cache-dir requests==2.32.3 "psycopg[binary]==3.2.3" boto3==1.35.0
-
-# 5. Copy project metadata and code (changes often → near the bottom)
-COPY pyproject.toml ./
+# 5. Copy our code and install our package on top
 COPY src/ ./src/
+RUN uv sync --locked
 
-# 6. Install OUR package only; its dependencies are already installed above
-RUN pip install --no-cache-dir --no-deps .
+# 6. Use the project's virtual environment by default
+ENV PATH="/app/.venv/bin:$PATH"
 
-# 7. Run the ingestion module
 CMD ["python", "-m", "nyc_mobility.ingestion.main"]
