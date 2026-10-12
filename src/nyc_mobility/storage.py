@@ -4,13 +4,14 @@ from nyc_mobility.config import Settings
 
 # ---------- object storage ----------
 
+
 def get_s3_client(settings: Settings):
     return boto3.client(
         "s3",
         endpoint_url=settings.s3_endpoint_url,
         aws_access_key_id=settings.s3_access_key,
         aws_secret_access_key=settings.s3_secret_key,
-        region_name="us-east-1",                  # required by boto3; object store ignores it
+        region_name="us-east-1",  # required by boto3; object store ignores it
     )
 
 

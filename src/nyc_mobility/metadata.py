@@ -1,13 +1,9 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import psycopg
 
 
-
-
-
-
-def record_load(dsn:str,dataset: str, year_month: str, object_key: str, size_bytes: int) -> None:
+def record_load(dsn: str, dataset: str, year_month: str, object_key: str, size_bytes: int) -> None:
     with psycopg.connect(dsn) as conn:
         conn.execute(
             """
@@ -35,5 +31,5 @@ def record_load(dsn:str,dataset: str, year_month: str, object_key: str, size_byt
                 loaded_at  = EXCLUDED.loaded_at
             WHERE EXCLUDED.loaded_at > raw_file_loads.loaded_at;
             """,
-            (dataset, year_month, object_key, size_bytes, datetime.now(timezone.utc)),
+            (dataset, year_month, object_key, size_bytes, datetime.now(UTC)),
         )
