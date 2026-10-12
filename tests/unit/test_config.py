@@ -47,7 +47,7 @@ def test_postgres_dsn_is_built_from_parts(required_env, monkeypatch):
 
 
 def test_from_env_fails_fast_when_required_setting_missing(required_env, monkeypatch):
-    monkeypatch.delenv("S3_BUCKET")                  # Arrange: remove one required variable
+    monkeypatch.delenv("S3_BUCKET")  # Arrange: remove one required variable
 
     with pytest.raises(KeyError, match="S3_BUCKET"):  # Assert: we expect a KeyError...
-        Settings.from_env()                           # Act: ...when building settings
+        Settings.from_env()  # Act: ...when building settings
