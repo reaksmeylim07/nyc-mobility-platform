@@ -1,4 +1,4 @@
-.PHONY: up down reset run logs psql test lint format up-airflow
+.PHONY: up down reset run logs psql test test-dags lint format up-airflow
 
 up:        ## Start all services in the background
 	docker compose up -d --build
@@ -23,6 +23,11 @@ psql:      ## Open a SQL shell inside Postgres
 
 test:      ## Run the unit tests
 	uv run pytest
+
+test-dags: ## Run DAG integrity tests inside the Airflow image
+	docker build -f docker/airflow/Dockerfile -t nyc-mobility-airflow:local .
+	docker run --rm -v "$(CURDIR)":/repo -w /repo nyc-mobility-airflow:local \
+		bash -c "pip install --quiet pytest && python -m pytest tests/dags -q -p no:cacheprovider"
 
 lint:      ## Check code style and common bugs
 	uv run ruff check .
