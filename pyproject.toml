@@ -26,3 +26,17 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle: basic style errors
+    "F",   # pyflakes: unused imports, undefined names (real bugs)
+    "I",   # isort: import ordering
+    "B",   # bugbear: common bug patterns
+    "UP",  # pyupgrade: use modern Python syntax
+]

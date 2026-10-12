@@ -1,4 +1,4 @@
-.PHONY: up down reset run logs psql test
+.PHONY: up down reset run logs psql test lint format
 
 up:        ## Start all services in the background
 	docker compose up -d --build
@@ -20,3 +20,11 @@ psql:      ## Open a SQL shell inside Postgres
 
 test:      ## Run the unit tests
 	uv run pytest
+
+lint:      ## Check code style and common bugs
+	uv run ruff check .
+	uv run ruff format --check .
+
+format:    ## Auto-fix style issues
+	uv run ruff check --fix .
+	uv run ruff format .
