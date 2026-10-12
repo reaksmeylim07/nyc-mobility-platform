@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  pull_request:            # every PR
+  push:
+    branches: [main]       # and every merge into main
+
+permissions:
+  contents: read           # least privilege: this workflow can only read the repo
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true # a new push cancels the outdated run for the same branch
+
+jobs:
+  lint-and-test:
+    name: Lint & unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.13.0"      # same uv version as the Dockerfile
+          enable-cache: true     # reuse downloaded packages between runs
+
+      - name: Install dependencies from the lockfile
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Unit tests
+        run: uv run pytest
+
+  docker-build:
+    name: Docker image builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+
+      - name: Build the ingestion image
+        run: docker build -f docker/ingestion/Dockerfile -t nyc-ingestion:ci .
