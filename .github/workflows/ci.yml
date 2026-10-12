@@ -49,3 +49,14 @@ jobs:
 
       - name: Build the ingestion image
         run: docker build -f docker/ingestion/Dockerfile -t nyc-ingestion:ci .
+        
+  dag-integrity:
+    name: DAG integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+
+      - name: Build the Airflow image and test the DAGs
+        run: make test-dags
