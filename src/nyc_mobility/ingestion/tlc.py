@@ -1,10 +1,24 @@
 import os
-
+import re
 
 import requests
 
 TLC_BASE_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data"
 
+
+def parse_year_month(year_month: str) -> tuple[str, str]:
+    """Split 'YYYY-MM' into ('YYYY', 'MM'). Raise ValueError if the format is invalid."""
+    match = re.fullmatch(r"\d{4}-\d{2}", year_month)
+    if not match: 
+        raise ValueError(f"Invalid year_month {year_month!r}, expected 'YYYY-MM'")
+    
+    year, month = year_month.split("-")
+
+    if not (1<=int(month)<=12):
+        raise ValueError(f"Invalid Month: {month}, expected 01 to 12")
+    return year, month
+    
+        
 
 # ---------- naming ----------
 
@@ -15,7 +29,7 @@ def build_object_key(dataset: str, year_month: str) -> str:
         build_object_key("yellow_tripdata", "2024-01")
         -> "raw/yellow_tripdata/year=2024/month=01/yellow_tripdata_2024-01.parquet"
     """
-    year, month = year_month.split("-")
+    year, month = parse_year_month(year_month)
     return f"raw/{dataset}/year={year}/month={month}/{dataset}_{year_month}.parquet"
 
 
