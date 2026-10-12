@@ -1,4 +1,4 @@
-.PHONY: up down reset run logs psql
+.PHONY: up down reset run logs psql test
 
 up:        ## Start all services in the background
 	docker compose up -d --build
@@ -10,10 +10,13 @@ reset:     ## Stop services AND delete all data
 	docker compose down -v
 
 run:       ## Run the ingestion job once
-	docker compose run --rm ingestion
+	docker compose run --rm --build ingestion
 
 logs:      ## Follow logs from all services
 	docker compose logs -f
 
 psql:      ## Open a SQL shell inside Postgres
 	docker compose exec postgres psql -U nyc -d nyc_mobility
+
+test:      ## Run the unit tests
+	uv run pytest
