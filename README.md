@@ -1,5 +1,7 @@
 # NYC Mobility Platform
 
+[![CI](https://github.com/reaksmeylim07/nyc-mobility-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/reaksmeylim07/nyc-mobility-platform/actions/workflows/ci.yml)
+
 An end-to-end data platform that ingests, processes, and validates New York City
 taxi and for-hire vehicle trip data to deliver reliable, analysis-ready datasets
 on urban mobility demand, revenue, and congestion patterns.
