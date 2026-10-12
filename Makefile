@@ -1,13 +1,16 @@
-.PHONY: up down reset run logs psql test lint format
+.PHONY: up down reset run logs psql test lint format up-airflow
 
 up:        ## Start all services in the background
 	docker compose up -d --build
 
+up-airflow: ## Start the full stack including Airflow (UI: http://localhost:8080)
+	docker compose --profile airflow up -d --build
+
 down:      ## Stop services (keeps data)
-	docker compose down
+	docker compose --profile airflow down
 
 reset:     ## Stop services AND delete all data
-	docker compose down -v
+	docker compose --profile airflow down -v
 
 run:       ## Run the ingestion job once
 	docker compose run --rm --build ingestion
