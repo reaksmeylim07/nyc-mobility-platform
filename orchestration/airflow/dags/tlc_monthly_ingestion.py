@@ -22,7 +22,8 @@ from airflow.sdk.exceptions import AirflowFailException
         "year_month": Param(
             None,
             type=["null", "string"],
-            description="Month to load as YYYY-MM. Required for manual runs; leave empty otherwise.",
+            description="Month to load as YYYY-MM. "
+            "Required for manual runs; leave empty otherwise.",
         ),
     },
     tags=["ingestion", "tlc"],

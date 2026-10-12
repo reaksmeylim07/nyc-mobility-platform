@@ -13,7 +13,7 @@ def resolve_year_month(override: str | None, interval_start: datetime | None) ->
     if override is not None:
         parse_year_month(override)
         return override
-    
+
     if interval_start is not None:
         return interval_start.strftime("%Y-%m")
 
