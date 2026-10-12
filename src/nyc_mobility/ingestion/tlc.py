@@ -30,9 +30,7 @@ def build_object_key(dataset: str, year_month: str) -> str:
         -> "raw/yellow_tripdata/year=2024/month=01/yellow_tripdata_2024-01.parquet"
     """
     year, month = parse_year_month(year_month)
-    #return f"raw/{dataset}/year={year}/month={month}/{dataset}_{year_month}.parquet"
-    return f"raw/{dataset}/year={year}/{dataset}_{year_month}.parquet"
-
+    return f"raw/{dataset}/year={year}/month={month}/{dataset}_{year_month}.parquet"
 
 
 def build_source_url(dataset: str, year_month: str) -> str:
