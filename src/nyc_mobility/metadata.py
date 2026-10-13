@@ -23,7 +23,7 @@ def record_load(dsn: str, dataset: str, year_month: str, object_key: str, size_b
             """
             INSERT INTO raw_file_loads (dataset, year_month, object_key, size_bytes, loaded_at)
             VALUES (%s, %s, %s, %s, %s)
-            ON CONFLICT (object_key) 
+            ON CONFLICT (object_key)
             DO UPDATE SET
                 dataset    = EXCLUDED.dataset,
                 year_month = EXCLUDED.year_month,

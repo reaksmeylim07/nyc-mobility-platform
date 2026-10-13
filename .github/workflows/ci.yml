@@ -49,7 +49,7 @@ jobs:
 
       - name: Build the ingestion image
         run: docker build -f docker/ingestion/Dockerfile -t nyc-ingestion:ci .
-        
+
   dag-integrity:
     name: DAG integrity
     runs-on: ubuntu-latest
