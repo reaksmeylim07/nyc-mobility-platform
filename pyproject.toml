@@ -19,6 +19,7 @@ packages = ["src/nyc_mobility"]     # tells the build tool where the package liv
 
 [dependency-groups]
 dev = [
+    "pre-commit>=4.7.0",
     "pytest>=9.1.1",
     "ruff>=0.17.0",
 ]
